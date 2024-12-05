@@ -1,9 +1,0 @@
-Model,Accuracy,AUC
-LSTM,0.8,0.976
-Logistic Regression (Keras),0.625,0.5
-ANN,0.625,0.5
-SVM (Approximation),0.5375,0.714
-XGBoost (Approximation),0.4125,0.5846666666666667
-CNN,0.4,0.878
-RNN,0.375,0.3406666666666666
-Decision Tree (Approximation),0.375,0.5313333333333333

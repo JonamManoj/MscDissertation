@@ -1,16 +1,17 @@
-
 import 'package:flutter/material.dart';
 
 class ResultPage extends StatelessWidget {
   final String diagnosis;
   final double confidenceCKD;
   final double confidenceNoCKD;
+  final String selectedModel;
 
   const ResultPage({
     Key? key,
     required this.diagnosis,
     required this.confidenceCKD,
     required this.confidenceNoCKD,
+    required this.selectedModel,
   }) : super(key: key);
 
   @override
@@ -30,6 +31,11 @@ class ResultPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(
+                  'Model Used: $selectedModel',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
                 Text(
                   diagnosis,
                   style: TextStyle(
