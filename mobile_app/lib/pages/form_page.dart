@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_dropdown.dart';
@@ -5,116 +6,149 @@ import 'result_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class FormPage extends StatelessWidget {
+class FormPage extends StatefulWidget {
   const FormPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-    final Map<String, dynamic> inputData = {};
+  State<FormPage> createState() => _FormPageState();
+}
 
-    void _showErrorDialog(BuildContext context, String message) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: Text(message),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
+class _FormPageState extends State<FormPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  // Controllers for text fields
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController bpController = TextEditingController();
+  final TextEditingController sgController = TextEditingController();
+  final TextEditingController alController = TextEditingController();
+  final TextEditingController suController = TextEditingController();
+  final TextEditingController bgrController = TextEditingController();
+  final TextEditingController buController = TextEditingController();
+  final TextEditingController scController = TextEditingController();
+  final TextEditingController sodController = TextEditingController();
+  final TextEditingController potController = TextEditingController();
+  final TextEditingController hemoController = TextEditingController();
+  final TextEditingController pcvController = TextEditingController();
+  final TextEditingController wbccController = TextEditingController();
+  final TextEditingController rbccController = TextEditingController();
+
+  // ValueNotifiers for dropdowns
+  final ValueNotifier<String?> rbcNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> pcNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> pccNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> baNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> htnNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> dmNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> cadNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> appetNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> peNotifier = ValueNotifier(null);
+  final ValueNotifier<String?> aneNotifier = ValueNotifier(null);
+
+  void _submitForm() async {
+    if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
+      return;
+    }
+
+    print('Form validation passed');
+
+    // Prepare input data
+    final inputData = {
+      "age": int.tryParse(ageController.text),
+      "bp": int.tryParse(bpController.text),
+      "sg": double.tryParse(sgController.text),
+      "al": int.tryParse(alController.text),
+      "su": int.tryParse(suController.text),
+      "rbc": rbcNotifier.value,
+      "pc": pcNotifier.value,
+      "pcc": pccNotifier.value,
+      "ba": baNotifier.value,
+      "bgr": int.tryParse(bgrController.text),
+      "bu": int.tryParse(buController.text),
+      "sc": double.tryParse(scController.text),
+      "sod": double.tryParse(sodController.text),
+      "pot": double.tryParse(potController.text),
+      "hemo": double.tryParse(hemoController.text),
+      "pcv": int.tryParse(pcvController.text),
+      "wbcc": int.tryParse(wbccController.text),
+      "rbcc": double.tryParse(rbccController.text),
+      "htn": htnNotifier.value,
+      "dm": dmNotifier.value,
+      "cad": cadNotifier.value,
+      "appet": appetNotifier.value,
+      "pe": peNotifier.value,
+      "ane": aneNotifier.value,
+    };
+
+    print('Captured Input Data: $inputData');
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.16.0.82:8080/diagnosis'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"patient_data": inputData}),
       );
-    }
 
-    void _submitForm() async {
-      if (!_formKey.currentState!.validate()) {
-        return; // Stop if the form is invalid
-      }
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
-      _formKey.currentState!.save();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
-      print('Captured Input Data: $inputData');
+        // Extract confidence probabilities
+        List<dynamic> confidenceList = data['confidence'] ?? [];
+        double confidenceCKD = 0.0;
+        double confidenceNoCKD = 0.0;
 
-      try {
-        // Prepare input for API
-        Map<String, dynamic> input = {
-          "patient_data": {
-            "age": inputData['age'] != null ? double.tryParse(inputData['age']!) : null,
-            "bp": inputData['bp'] != null ? double.tryParse(inputData['bp']!) : null,
-            "sg": inputData['sg'] != null ? double.tryParse(inputData['sg']!) : null,
-            "al": inputData['al'] != null ? int.tryParse(inputData['al']!) : null,
-            "su": inputData['su'] != null ? int.tryParse(inputData['su']!) : null,
-            "rbc": inputData['rbc'],
-            "pc": inputData['pc'],
-            "pcc": inputData['pcc'],
-            "ba": inputData['ba'],
-            "bgr": inputData['bgr'] != null ? double.tryParse(inputData['bgr']!) : null,
-            "bu": inputData['bu'] != null ? double.tryParse(inputData['bu']!) : null,
-            "sc": inputData['sc'] != null ? double.tryParse(inputData['sc']!) : null,
-            "sod": inputData['sod'] != null ? double.tryParse(inputData['sod']!) : null,
-            "pot": inputData['pot'] != null ? double.tryParse(inputData['pot']!) : null,
-            "hemo": inputData['hemo'] != null ? double.tryParse(inputData['hemo']!) : null,
-            "pcv": inputData['pcv'] != null ? int.tryParse(inputData['pcv']!) : null,
-            "wbcc": inputData['wbcc'] != null ? int.tryParse(inputData['wbcc']!) : null,
-            "rbcc": inputData['rbcc'] != null ? double.tryParse(inputData['rbcc']!) : null,
-            "htn": inputData['htn'],
-            "dm": inputData['dm'],
-            "cad": inputData['cad'],
-            "appet": inputData['appet'],
-            "pe": inputData['pe'],
-            "ane": inputData['ane'],
-          },
-          "model": "best_ckd_model",
-        };
-
-        print('API Request Body: $input');
-
-        // Make the API request
-        final response = await http.post(
-          Uri.parse('http://172.16.2.86:8080/diagnosis'),
-          headers: <String, String>{'Content-Type': 'application/json'},
-          body: jsonEncode(input),
-        );
-
-        print('Response Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-          var data = jsonDecode(response.body);
-
-          // Extract confidence
-          List<dynamic> confidenceList = data['confidence'] ?? [];
-          List<double> confidence = confidenceList.isNotEmpty ? confidenceList[0].cast<double>() : [0.0, 0.0];
-
-          double confidenceCKD = confidence.length > 1 ? confidence[1] : 0.0;
-          double confidenceNoCKD = confidence.length > 0 ? confidence[0] : 0.0;
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultPage(
-                diagnosis: data['diagnosis'] ?? "No diagnosis available",
-                confidenceCKD: confidenceCKD,
-                confidenceNoCKD: confidenceNoCKD,
-              ),
-            ),
-          );
-        } else {
-          _showErrorDialog(context, 'Failed to get prediction. Try again!');
+        if (confidenceList.isNotEmpty && confidenceList[0] is List) {
+          confidenceCKD = (confidenceList[0][1] as num).toDouble();
+          confidenceNoCKD = (confidenceList[0][0] as num).toDouble();
         }
-      } catch (e) {
-        _showErrorDialog(context, 'Error: $e');
-      }
-    }
 
+        print('Confidence CKD: $confidenceCKD');
+        print('Confidence No CKD: $confidenceNoCKD');
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultPage(
+              diagnosis: data['diagnosis'] ?? "No diagnosis available",
+              confidenceCKD: confidenceCKD, // Adjust if confidence is not returned
+              confidenceNoCKD: confidenceNoCKD, // Adjust if confidence is not returned
+            ),
+          ),
+        );
+      } else {
+        _showErrorDialog(context, 'Failed to get prediction. Try again!');
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Error: $e');
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CKD Predictor Form'),
+        title: const Text('CKD Analyser Form'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -123,91 +157,134 @@ class FormPage extends StatelessWidget {
           child: ListView(
             children: [
               CustomTextField(
-                  label: 'Age', onSaved: (value) => inputData['age'] = value),
+                label: 'Age',
+                controller: ageController,
+                validator: (value) => value == null || value.isEmpty ? 'Age cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Blood Pressure (BP)',
-                  onSaved: (value) => inputData['bp'] = value),
+                label: 'Blood Pressure (BP)',
+                controller: bpController,
+                validator: (value) => value == null || value.isEmpty ? 'BP cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Specific Gravity (SG)',
-                  onSaved: (value) => inputData['sg'] = value),
+                label: 'Specific Gravity (SG)',
+                controller: sgController,
+                validator: (value) => value == null || value.isEmpty ? 'SG cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Albumin (AL)', onSaved: (value) => inputData['al'] = value),
+                label: 'Albumin (AL)',
+                controller: alController,
+                validator: (value) => value == null || value.isEmpty ? 'AL cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Sugar (SU)', onSaved: (value) => inputData['su'] = value),
+                label: 'Sugar (SU)',
+                controller: suController,
+                validator: (value) => value == null || value.isEmpty ? 'SU cannot be empty' : null,
+              ),
               CustomDropdown(
                 label: 'Red Blood Cells (RBC)',
                 items: ['normal', 'abnormal'],
-                onSaved: (value) => inputData['rbc'] = value,
+                selectedValue: rbcNotifier,
+                validator: (value) => value == null ? 'RBC cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Pus Cell (PC)',
                 items: ['normal', 'abnormal'],
-                onSaved: (value) => inputData['pc'] = value,
+                selectedValue: pcNotifier,
+                validator: (value) => value == null ? 'PC cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Pus Cell Clumps (PCC)',
                 items: ['present', 'notpresent'],
-                onSaved: (value) => inputData['pcc'] = value,
+                selectedValue: pccNotifier,
+                validator: (value) => value == null ? 'PCC cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Bacteria (BA)',
                 items: ['present', 'notpresent'],
-                onSaved: (value) => inputData['ba'] = value,
+                selectedValue: baNotifier,
+                validator: (value) => value == null ? 'BA cannot be empty' : null,
               ),
               CustomTextField(
-                  label: 'Blood Glucose Random (BGR)',
-                  onSaved: (value) => inputData['bgr'] = value),
+                label: 'Blood Glucose Random (BGR)',
+                controller: bgrController,
+                validator: (value) => value == null || value.isEmpty ? 'BGR cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Blood Urea (BU)', onSaved: (value) => inputData['bu'] = value),
+                label: 'Blood Urea (BU)',
+                controller: buController,
+                validator: (value) => value == null || value.isEmpty ? 'BU cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Serum Creatinine (SC)',
-                  onSaved: (value) => inputData['sc'] = value),
+                label: 'Serum Creatinine (SC)',
+                controller: scController,
+                validator: (value) => value == null || value.isEmpty ? 'SC cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Sodium (SOD)', onSaved: (value) => inputData['sod'] = value),
+                label: 'Sodium (SOD)',
+                controller: sodController,
+                validator: (value) => value == null || value.isEmpty ? 'SOD cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Potassium (POT)',
-                  onSaved: (value) => inputData['pot'] = value),
+                label: 'Potassium (POT)',
+                controller: potController,
+                validator: (value) => value == null || value.isEmpty ? 'POT cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Hemoglobin (HEMO)',
-                  onSaved: (value) => inputData['hemo'] = value),
+                label: 'Hemoglobin (HEMO)',
+                controller: hemoController,
+                validator: (value) => value == null || value.isEmpty ? 'HEMO cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Packed Cell Volume (PCV)',
-                  onSaved: (value) => inputData['pcv'] = value),
+                label: 'Packed Cell Volume (PCV)',
+                controller: pcvController,
+                validator: (value) => value == null || value.isEmpty ? 'PCV cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'White Blood Cell Count (WBCC)',
-                  onSaved: (value) => inputData['wbcc'] = value),
+                label: 'White Blood Cell Count (WBCC)',
+                controller: wbccController,
+                validator: (value) => value == null || value.isEmpty ? 'WBCC cannot be empty' : null,
+              ),
               CustomTextField(
-                  label: 'Red Blood Cell Count (RBCC)',
-                  onSaved: (value) => inputData['rbcc'] = value),
+                label: 'Red Blood Cell Count (RBCC)',
+                controller: rbccController,
+                validator: (value) => value == null || value.isEmpty ? 'RBCC cannot be empty' : null,
+              ),
               CustomDropdown(
                 label: 'Hypertension (HTN)',
                 items: ['yes', 'no'],
-                onSaved: (value) => inputData['htn'] = value,
+                selectedValue: htnNotifier,
+                validator: (value) => value == null ? 'HTN cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Diabetes Mellitus (DM)',
                 items: ['yes', 'no'],
-                onSaved: (value) => inputData['dm'] = value,
+                selectedValue: dmNotifier,
+                validator: (value) => value == null ? 'DM cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Coronary Artery Disease (CAD)',
                 items: ['yes', 'no'],
-                onSaved: (value) => inputData['cad'] = value,
+                selectedValue: cadNotifier,
+                validator: (value) => value == null ? 'CAD cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Appetite (APPET)',
                 items: ['good', 'poor'],
-                onSaved: (value) => inputData['appet'] = value,
+                selectedValue: appetNotifier,
+                validator: (value) => value == null ? 'Appetite cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Pedal Edema (PE)',
                 items: ['yes', 'no'],
-                onSaved: (value) => inputData['pe'] = value,
+                selectedValue: peNotifier,
+                validator: (value) => value == null ? 'PE cannot be empty' : null,
               ),
               CustomDropdown(
                 label: 'Anemia (ANE)',
                 items: ['yes', 'no'],
-                onSaved: (value) => inputData['ane'] = value,
+                selectedValue: aneNotifier,
+                validator: (value) => value == null ? 'ANE cannot be empty' : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(

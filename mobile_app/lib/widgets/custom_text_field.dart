@@ -1,13 +1,16 @@
+
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
-  final void Function(String?)? onSaved;
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     Key? key,
     required this.label,
-    this.onSaved,
+    required this.controller,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -15,18 +18,13 @@ class CustomTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
         ),
         keyboardType: TextInputType.number,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter $label';
-          }
-          return null;
-        },
-        onSaved: onSaved,
+        validator: validator,
       ),
     );
   }

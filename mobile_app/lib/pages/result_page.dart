@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class ResultPage extends StatelessWidget {
@@ -40,8 +41,8 @@ class ResultPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text(
                   isPositive
-                      ? 'Confidence CKD: $confidenceCKD%\nPlease consult a doctor for further diagnosis.'
-                      : 'Confidence No CKD: $confidenceNoCKD%\nYou are healthy. Keep maintaining a good lifestyle!',
+                      ? 'Confidence CKD: ${confidenceCKD.toStringAsFixed(2)}%\nPlease consult a doctor for further diagnosis.'
+                      : 'Confidence No CKD: ${confidenceNoCKD.toStringAsFixed(2)}%\nYou are healthy. Keep maintaining a good lifestyle!',
                   style: const TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),

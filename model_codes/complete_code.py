@@ -221,7 +221,7 @@ class CKDPredictor:
 
 
 def main():
-    data_path = 'chronic_kidney_disease_full.csv'
+    data_path = 'data/chronic_kidney_disease_full.csv'
     predictor = CKDPredictor(data_path)
 
     predictor.preprocess_data()

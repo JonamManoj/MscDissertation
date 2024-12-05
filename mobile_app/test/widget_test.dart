@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ckd_predictor/main.dart'; // Import your main.dart file where CKDApp is defined
+import 'package:ckd_analyser/main.dart'; // Import your main.dart file where CKDApp is defined
 
 void main() {
-  testWidgets('CKD Predictor smoke test', (WidgetTester tester) async {
+  testWidgets('CKD Analyser smoke test', (WidgetTester tester) async {
     // Build the CKDApp widget
     await tester.pumpWidget(CKDApp());
 
     // Verify the initial UI is built correctly
-    expect(find.text('CKD Predictor'), findsOneWidget); // Checks that the title is displayed correctly
+    expect(find.text('CKD Analyser'), findsOneWidget); // Checks that the title is displayed correctly
 
     // Find text input fields
     final ageField = find.byType(TextField).first;
@@ -26,6 +26,6 @@ void main() {
     await tester.pump();
 
     // Since this is a smoke test, we are only checking for basic behavior
-    expect(find.text('CKD Predictor'), findsOneWidget);
+    expect(find.text('CKD Analyser'), findsOneWidget);
   });
 }

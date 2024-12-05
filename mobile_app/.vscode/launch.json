@@ -2,20 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ckd_predictor",
+            "name": "ckd_analyser",
             "request": "launch",
             "type": "dart",
             "program": "lib/main.dart"
         },
         {
-            "name": "ckd_predictor (profile mode)",
+            "name": "ckd_analyser (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile",
             "program": "lib/main.dart"
         },
         {
-            "name": "ckd_predictor (release mode)",
+            "name": "ckd_analyser (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",

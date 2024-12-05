@@ -1,40 +1,45 @@
+
 import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String label;
   final List<String> items;
-  final void Function(String?)? onSaved;
+  final ValueNotifier<String?> selectedValue;
+  final String? Function(String?)? validator;
 
   const CustomDropdown({
     Key? key,
     required this.label,
     required this.items,
-    this.onSaved,
+    required this.selectedValue,
+    this.validator,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-        items: items
-            .map((item) => DropdownMenuItem(
-                  value: item,
-                  child: Text(item),
-                ))
-            .toList(),
-        onChanged: (value) {},
-        validator: (value) {
-          if (value == null) {
-            return 'Please select $label';
-          }
-          return null;
+      child: ValueListenableBuilder<String?>(
+        valueListenable: selectedValue,
+        builder: (context, value, _) {
+          return DropdownButtonFormField<String>(
+            value: value,
+            decoration: InputDecoration(
+              labelText: label,
+              border: const OutlineInputBorder(),
+            ),
+            items: items
+                .map((item) => DropdownMenuItem(
+                      value: item,
+                      child: Text(item),
+                    ))
+                .toList(),
+            onChanged: (newValue) {
+              selectedValue.value = newValue;
+            },
+            validator: validator,
+          );
         },
-        onSaved: onSaved,
       ),
     );
   }

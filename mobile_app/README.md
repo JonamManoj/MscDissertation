@@ -1,4 +1,4 @@
-# ckd_predictor
+# ckd_analyser
 
 A new Flutter project.
 

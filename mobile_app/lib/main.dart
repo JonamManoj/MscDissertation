@@ -11,7 +11,7 @@ class CKDApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CKD Predictor',
+      title: 'CKD Analyser',
       theme: ThemeData(
         primarySwatch: Colors.teal,
         brightness: Brightness.light,

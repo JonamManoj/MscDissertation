@@ -1,6 +1,6 @@
 {
-    "name": "ckd_predictor",
-    "short_name": "ckd_predictor",
+    "name": "ckd_analyser",
+    "short_name": "ckd_analyser",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

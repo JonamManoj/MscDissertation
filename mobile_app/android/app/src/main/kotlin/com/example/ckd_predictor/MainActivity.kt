@@ -1,4 +1,4 @@
-package com.example.ckd_predictor
+package com.example.ckd_analyser
 
 import io.flutter.embedding.android.FlutterActivity
 
